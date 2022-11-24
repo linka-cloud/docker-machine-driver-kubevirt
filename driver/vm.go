@@ -9,25 +9,6 @@ import (
 	v1 "kubevirt.io/api/core/v1"
 )
 
-var (
-	userData = `#cloud-config
-chpasswd: { expire: False }
-ssh:
-  emit_keys_to_console: false
-no_ssh_fingerprints: true
-users:
-- name: %s
-  plain_text_passwd: root
-  lock_passwd: false
-  ssh_authorized_keys:
-  - %s
-`
-)
-
-func P[T any](v T) *T {
-	return &v
-}
-
 func sshSecretName(name string) string {
 	return fmt.Sprintf("%s-ssh", name)
 }
@@ -127,4 +108,8 @@ func makeVM(namespace, name, image string, cpus uint32, mem resource.Quantity) *
 			},
 		},
 	}
+}
+
+func P[T any](v T) *T {
+	return &v
 }
