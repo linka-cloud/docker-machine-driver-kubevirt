@@ -1,0 +1,24 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: docker-machine
+  labels:
+    app: docker-machine
+    namespace: default
+spec:
+  replicas: 1
+  template:
+    metadata:
+      name: docker-machine
+      labels:
+        app: docker-machine
+    spec:
+      containers:
+      - name: docker-machine
+        image: linkacloud/docker-machine
+        imagePullPolicy: Always
+      restartPolicy: Always
+      serviceAccountName: docker-machine
+  selector:
+    matchLabels:
+      app: docker-machine
