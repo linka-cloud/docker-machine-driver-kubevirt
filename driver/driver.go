@@ -190,6 +190,9 @@ func (d *Driver) GetState() (state.State, error) {
 	}
 	vm, err := c.VirtualMachine(d.Namespace).Get(d.MachineName, &metav1.GetOptions{})
 	if err != nil {
+		if apierrors.IsNotFound(err) {
+			return state.None, nil
+		}
 		return state.Error, fmt.Errorf("failed to get vm: %w", err)
 	}
 	switch vm.Status.PrintableStatus {
@@ -235,15 +238,18 @@ func (d *Driver) Remove() error {
 	if err != nil {
 		return err
 	}
-	if s != state.Stopped {
+	if s == state.Running {
 		if err := d.Kill(); err != nil {
 			return err
 		}
 	}
-	if err := c.VirtualMachine(d.Namespace).Delete(d.MachineName, &metav1.DeleteOptions{}); err != nil {
+	if err := c.VirtualMachine(d.Namespace).Delete(d.MachineName, &metav1.DeleteOptions{}); err != nil && !apierrors.IsNotFound(err) {
 		return err
 	}
-	return c.CoreV1().Secrets(d.Namespace).Delete(context.TODO(), sshSecretName(d.MachineName), metav1.DeleteOptions{})
+	if err := c.CoreV1().Secrets(d.Namespace).Delete(context.TODO(), sshSecretName(d.MachineName), metav1.DeleteOptions{}); err != nil && !apierrors.IsNotFound(err) {
+		return err
+	}
+	return nil
 }
 
 func (d *Driver) Restart() error {
