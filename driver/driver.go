@@ -231,8 +231,14 @@ func (d *Driver) Remove() error {
 	if err != nil {
 		return err
 	}
-	if err := d.Kill(); err != nil {
+	s, err := d.GetState()
+	if err != nil {
 		return err
+	}
+	if s != state.Stopped {
+		if err := d.Kill(); err != nil {
+			return err
+		}
 	}
 	if err := c.VirtualMachine(d.Namespace).Delete(d.MachineName, &metav1.DeleteOptions{}); err != nil {
 		return err
