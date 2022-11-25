@@ -9,6 +9,8 @@ import (
 	v1 "kubevirt.io/api/core/v1"
 )
 
+const disk0 = "disk0"
+
 func sshSecretName(name string) string {
 	return fmt.Sprintf("%s-ssh", name)
 }
@@ -70,7 +72,7 @@ func makeVM(namespace, name, image string, cpus uint32, mem resource.Quantity) *
 							Rng:                      &v1.Rng{},
 							Disks: []v1.Disk{
 								{
-									Name: defaultUser,
+									Name: disk0,
 									DiskDevice: v1.DiskDevice{
 										Disk: &v1.DiskTarget{Bus: "virtio"},
 									},
@@ -96,7 +98,7 @@ func makeVM(namespace, name, image string, cpus uint32, mem resource.Quantity) *
 					},
 					Volumes: []v1.Volume{
 						{
-							Name: "root",
+							Name: disk0,
 							VolumeSource: v1.VolumeSource{
 								ContainerDisk: &v1.ContainerDiskSource{
 									Image: image,

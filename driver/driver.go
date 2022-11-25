@@ -276,7 +276,7 @@ func (d *Driver) Stop() error {
 	if err != nil {
 		return err
 	}
-	return c.VirtualMachine(d.Namespace).Stop(d.MachineName, &v1.StopOptions{})
+	return c.VirtualMachine(d.Namespace).Stop(d.MachineName, &v1.StopOptions{GracePeriod: P(int64(0))})
 }
 
 func (d *Driver) DriverName() string {
